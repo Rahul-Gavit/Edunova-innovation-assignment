@@ -200,7 +200,6 @@ const PopupModal: React.FC<PopupModalProps> = ({
                       value: role,
                       label: role,
                     }))}
-                    isMulti
                   />
                 )}
               />
