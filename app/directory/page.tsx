@@ -6,9 +6,34 @@ import { MdDelete, MdEdit } from "react-icons/md";
 import PopupModal from "../components/PopUpModal";
 import DeletePopUpModal from "../components/DeletePopUpModal";
 
+interface Role {
+  value: string;
+  label: string;
+}
+
+interface Status {
+  value: string;
+  label: string;
+}
+
+interface Team {
+  value: string;
+  label: string;
+}
+
+interface UserData {
+  id: string | number;
+  name: string;
+  mail: string;
+  userImg: string;
+  role: Role[];
+  status: Status[];
+  teams: Team[];
+}
+
 const Directory = () => {
   const data = useMemo(() => generateFakeUsers(50), []);
-  const [selectedRowData, setSelectedRowData] = useState({});
+  const [selectedRowData, setSelectedRowData] = useState<UserData | null>(null);
   const [open, setOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -185,7 +210,7 @@ const Directory = () => {
       <DeletePopUpModal
         deleteOpen={deleteOpen}
         setDeleteOpen={setDeleteOpen}
-        selectedRowId={selectedRowData}
+        selectedRowData={selectedRowData}
       />
     </div>
   );

@@ -47,13 +47,14 @@ interface PopupModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   selectedRowData: {
+    id: string | number;
     name: string;
     mail: string;
     userImg: string;
     role: { value: string; label: string }[];
     status: { value: string; label: string }[];
     teams: { value: string; label: string }[];
-  };
+  } | null;
 }
 
 interface IFormInput {
@@ -77,7 +78,7 @@ const PopupModal: React.FC<PopupModalProps> = ({
     formState: { errors },
     control,
     handleSubmit,
-    setValue, // Use this to manually set values
+    setValue,
   } = useForm<IFormInput>({
     defaultValues: {
       name: "",
@@ -90,13 +91,14 @@ const PopupModal: React.FC<PopupModalProps> = ({
   });
 
   useEffect(() => {
-    // Update form values when selectedRowData changes
-    setValue("name", selectedRowData.name);
-    setValue("mail", selectedRowData.mail);
-    setValue("userImg", selectedRowData.userImg);
-    setValue("roles", selectedRowData.role);
-    setValue("status", selectedRowData.status);
-    setValue("teams", selectedRowData.teams);
+    if (selectedRowData) {
+      setValue("name", selectedRowData.name);
+      setValue("mail", selectedRowData.mail);
+      setValue("userImg", selectedRowData.userImg);
+      setValue("roles", selectedRowData.role);
+      setValue("status", selectedRowData.status);
+      setValue("teams", selectedRowData.teams);
+    }
   }, [selectedRowData, setValue]);
 
   const onSubmit: SubmitHandler<IFormInput> = (data) => console.log(data);
@@ -124,10 +126,10 @@ const PopupModal: React.FC<PopupModalProps> = ({
               type="image"
               width="100"
               height="100"
-              alt="Login"
-              src={selectedRowData.userImg}
+              alt="Profile"
+              src={selectedRowData?.userImg || ""}
               className="border rounded-full border-gray-300 outline-none"
-              {...register("userImg", { required: true })}
+              {...register("userImg")}
             />
             <div className="flex gap-x-2 my-4">
               <button
@@ -158,8 +160,10 @@ const PopupModal: React.FC<PopupModalProps> = ({
                 className="border rounded-sm border-gray-300 p-1.5 border-b-black outline-none"
                 {...register("name", { required: true, maxLength: 20 })}
               />
-              {errors.name?.type === "required" && (
-                <p role="alert">First name is required</p>
+              {errors.name && (
+                <p role="alert">
+                  Name is required and must be less than 20 characters
+                </p>
               )}
             </div>
 
@@ -196,6 +200,7 @@ const PopupModal: React.FC<PopupModalProps> = ({
                       value: role,
                       label: role,
                     }))}
+                    isMulti
                   />
                 )}
               />

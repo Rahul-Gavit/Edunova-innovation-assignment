@@ -6,7 +6,7 @@ import { RxCross2 } from "react-icons/rx";
 
 // Define the styles object for the modal
 const style = {
-  position: "absolute" as const, // Use 'as const' to ensure this value is treated as a constant
+  position: "absolute" as const,
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
@@ -20,18 +20,34 @@ const style = {
 
 // Define props interface for DeletePopUpModal component
 interface DeletePopUpModalProps {
-  deleteOpen: boolean; // Boolean to control the modal open state
-  setDeleteOpen: (open: boolean) => void; // Function to set the modal open state
-  selectedRowId: string | number; // ID of the selected row, can be a string or number
+  deleteOpen: boolean;
+  setDeleteOpen: (open: boolean) => void;
+  selectedRowData: {
+    id: string | number;
+    name: string;
+    mail: string;
+    userImg: string;
+    role: { value: string; label: string }[];
+    status: { value: string; label: string }[];
+    teams: { value: string; label: string }[];
+  } | null;
 }
 
 // Define the DeletePopUpModal component
 const DeletePopUpModal: React.FC<DeletePopUpModalProps> = ({
   deleteOpen,
   setDeleteOpen,
-  selectedRowId,
+  selectedRowData,
 }) => {
   const handleClose = () => setDeleteOpen(false);
+
+  const handleDelete = () => {
+    if (selectedRowData) {
+      // Perform delete action here, passing the selectedRowData
+      console.log(`Deleting member with details:`, selectedRowData);
+    }
+    handleClose();
+  };
 
   return (
     <Modal
@@ -50,21 +66,22 @@ const DeletePopUpModal: React.FC<DeletePopUpModalProps> = ({
           >
             Delete Member Details
           </Typography>
-          <RxCross2 className="h-4 w-4 cursor-pointer" onClick={handleClose} />
+          <RxCross2
+            className="h-4 w-4 cursor-pointer"
+            onClick={handleClose}
+            aria-label="Close"
+          />
         </div>
 
-        <p className="text-sm">
-          Are you sure you want to delete this Members details? This action
-          cannot be undone.
+        <p id="modal-modal-description" className="text-sm">
+          Are you sure you want to delete the details of{" "}
+          {selectedRowData?.name || "this member"}? This action cannot be
+          undone.
         </p>
         <div className="flex justify-end mt-4">
           <button
             className="bg-primary-light py-2 px-4 font-medium text-white rounded-md"
-            onClick={() => {
-              // Perform delete action here, passing the selectedRowId
-              console.log(`Deleting member with ID: ${selectedRowId}`);
-              handleClose();
-            }}
+            onClick={handleDelete}
           >
             DELETE
           </button>
