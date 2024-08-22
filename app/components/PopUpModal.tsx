@@ -8,7 +8,7 @@ import { FaArrowRotateLeft } from "react-icons/fa6";
 import { RiDeleteBinLine } from "react-icons/ri";
 
 const style = {
-  position: "absolute" as "absolute", // Type assertion to satisfy the type checker
+  position: "absolute" as "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
@@ -43,7 +43,6 @@ const defaultRoles = [
 
 const statuses = ["active", "inactive"];
 
-// Define the props type
 interface PopupModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -57,7 +56,6 @@ interface PopupModalProps {
   };
 }
 
-// Define the form input types
 interface IFormInput {
   name: string;
   mail: string;
@@ -74,42 +72,34 @@ const PopupModal: React.FC<PopupModalProps> = ({
 }) => {
   const handleClose = () => setOpen(false);
 
-  const [formData, setFormData] = useState<IFormInput>({
-    name: selectedRowData.name || "",
-    mail: selectedRowData.mail || "",
-    userImg: selectedRowData.userImg || "",
-    roles: selectedRowData.role || [],
-    status: selectedRowData.status || [],
-    teams: selectedRowData.teams || [],
-  });
-
   const {
     register,
     formState: { errors },
     control,
     handleSubmit,
-  } = useForm<IFormInput>();
-
-  const onSubmit: SubmitHandler<IFormInput> = (data) => console.log(data);
+    setValue, // Use this to manually set values
+  } = useForm<IFormInput>({
+    defaultValues: {
+      name: "",
+      mail: "",
+      userImg: "",
+      roles: [],
+      status: [],
+      teams: [],
+    },
+  });
 
   useEffect(() => {
-    setFormData({
-      name: selectedRowData.name || "",
-      mail: selectedRowData.mail || "",
-      userImg: selectedRowData.userImg || "",
-      roles: selectedRowData.role || [],
-      status: selectedRowData.status || [],
-      teams: selectedRowData.teams || [],
-    });
-  }, [selectedRowData]);
+    // Update form values when selectedRowData changes
+    setValue("name", selectedRowData.name);
+    setValue("mail", selectedRowData.mail);
+    setValue("userImg", selectedRowData.userImg);
+    setValue("roles", selectedRowData.role);
+    setValue("status", selectedRowData.status);
+    setValue("teams", selectedRowData.teams);
+  }, [selectedRowData, setValue]);
 
-  const inputChangeHandle = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
+  const onSubmit: SubmitHandler<IFormInput> = (data) => console.log(data);
 
   return (
     <Modal
@@ -135,9 +125,9 @@ const PopupModal: React.FC<PopupModalProps> = ({
               width="100"
               height="100"
               alt="Login"
-              src={formData.userImg}
+              src={selectedRowData.userImg}
               className="border rounded-full border-gray-300 outline-none"
-              {...register("userImg", { required: true, maxLength: 20 })}
+              {...register("userImg", { required: true })}
             />
             <div className="flex gap-x-2 my-4">
               <button
@@ -166,9 +156,6 @@ const PopupModal: React.FC<PopupModalProps> = ({
               </label>
               <input
                 className="border rounded-sm border-gray-300 p-1.5 border-b-black outline-none"
-                name="name"
-                value={formData.name}
-                onChange={inputChangeHandle}
                 {...register("name", { required: true, maxLength: 20 })}
               />
               {errors.name?.type === "required" && (
@@ -184,11 +171,8 @@ const PopupModal: React.FC<PopupModalProps> = ({
                 Email
               </label>
               <input
-                name="mail"
-                value={formData.mail}
-                onChange={inputChangeHandle}
-                className="border rounded-sm border-gray-300 p-1.5 border-b-black outline-none"
                 {...register("mail", { required: "Email Address is required" })}
+                className="border rounded-sm border-gray-300 p-1.5 border-b-black outline-none"
                 aria-invalid={errors.mail ? "true" : "false"}
               />
               {errors.mail && <p role="alert">{errors.mail.message}</p>}
@@ -208,7 +192,6 @@ const PopupModal: React.FC<PopupModalProps> = ({
                 render={({ field }) => (
                   <Select
                     {...field}
-                    defaultValue={formData.roles} // Set the default value for role
                     options={defaultRoles.map((role) => ({
                       value: role,
                       label: role,
@@ -230,7 +213,6 @@ const PopupModal: React.FC<PopupModalProps> = ({
                 render={({ field }) => (
                   <Select
                     {...field}
-                    defaultValue={formData.status} // Set the default value for status
                     options={statuses.map((status) => ({
                       value: status,
                       label: status.charAt(0).toUpperCase() + status.slice(1),
@@ -255,7 +237,6 @@ const PopupModal: React.FC<PopupModalProps> = ({
                 <Select
                   {...field}
                   isMulti
-                  defaultValue={formData.teams} // Set the default value for teams
                   options={defaultTeams.map((team) => ({
                     value: team,
                     label: team,
