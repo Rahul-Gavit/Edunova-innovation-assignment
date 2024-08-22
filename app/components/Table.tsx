@@ -98,12 +98,11 @@ const Table = <TData extends object>({ data, columns }: TableProps<TData>) => {
                       header.column.columnDef.header,
                       header.getContext()
                     )}
-                    {
-                      {
-                        asc: <FaArrowUp className="h-4 w-4 text-gray-500" />,
-                        desc: <FaArrowDown className="h-4 w-4 text-gray-500" />,
-                      }[header.column.getIsSorted() ?? null]
-                    }
+                    {header.column.getIsSorted() === "asc" ? (
+                      <FaArrowUp className="h-4 w-4 text-gray-500" />
+                    ) : header.column.getIsSorted() === "desc" ? (
+                      <FaArrowDown className="h-4 w-4 text-gray-500" />
+                    ) : null}
                   </span>
                 </th>
               ))}
