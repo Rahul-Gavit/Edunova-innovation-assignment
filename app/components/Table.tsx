@@ -8,6 +8,7 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
   flexRender,
+  SortingState,
 } from "@tanstack/react-table";
 import {
   FaArrowDown,
@@ -21,14 +22,21 @@ import { BiPlus } from "react-icons/bi";
 import "react-modern-drawer/dist/index.css";
 import SlidingPanelBar from "./SlidingPanelBar";
 
-const Table = ({ data, columns }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedRowData, setSelectedRowData] = useState({});
+// Define the types for the data and columns props
+interface TableProps<TData> {
+  data: TData[];
+  columns: any[]; // Replace 'any' with your column type if available
+}
+
+const Table = <TData extends object>({ data, columns }: TableProps<TData>) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [selectedRowData, setSelectedRowData] = useState<TData | null>(null);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [filtering, setFiltering] = useState<string>("");
+
   const toggleDrawer = () => {
     setIsOpen((prevState) => !prevState);
   };
-  const [sorting, setSorting] = useState([]);
-  const [filtering, setFiltering] = useState("");
 
   const table = useReactTable({
     data,
@@ -47,7 +55,7 @@ const Table = ({ data, columns }) => {
 
   return (
     <div>
-      <div className="flex justify-between border-b py-4 px-4 ">
+      <div className="flex justify-between border-b py-4 px-4">
         <div className="flex gap-x-2 items-center">
           <span className="text-lg font-bold">Team Members</span>
           <span className="bg-violet-50 border px-2 py-1 text-xs font-medium text-violet-600 rounded-full border-violet-300">
@@ -108,8 +116,7 @@ const Table = ({ data, columns }) => {
             <tr
               key={row.id}
               onClick={() => {
-                if (!row.original.preventSlide) {
-                  console.log(row.original);
+                if (!(row.original as any).preventSlide) {
                   setSelectedRowData(row.original);
                   toggleDrawer();
                 }
@@ -119,7 +126,7 @@ const Table = ({ data, columns }) => {
                 <td
                   key={cell.id}
                   className={`py-2 px-4 border-b ${
-                    row.id % 2 == 0 ? "bg-gray-50" : "bg-white"
+                    Number(row.id) % 2 === 0 ? "bg-gray-50" : "bg-white"
                   }`}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -144,7 +151,7 @@ const Table = ({ data, columns }) => {
           className="border py-1.5 px-4 rounded-md flex items-center gap-x-2"
         >
           Next
-          <FaArrowRight className="h-4  w-4 text-gray-500" />
+          <FaArrowRight className="h-4 w-4 text-gray-500" />
         </button>
       </div>
       <SlidingPanelBar

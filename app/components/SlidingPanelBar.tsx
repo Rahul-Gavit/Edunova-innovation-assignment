@@ -3,7 +3,30 @@ import { FaArrowUp } from "react-icons/fa6";
 import Drawer from "react-modern-drawer";
 import "react-modern-drawer/dist/index.css";
 
-const SlidingPanelBar = ({ selectedRowData, isOpen, toggleDrawer }) => {
+// Define the types for the props
+interface SlidingPanelBarProps {
+  selectedRowData: {
+    id?: string;
+    userImg?: string;
+    name?: string;
+    username?: string;
+    role?: string;
+    dob?: string;
+    gender?: string;
+    nationality?: string;
+    phone?: string;
+    mail?: string;
+    // Add any other fields that may be part of selectedRowData
+  } | null; // Allow null for initial state or no data
+  isOpen: boolean;
+  toggleDrawer: () => void;
+}
+
+const SlidingPanelBar: React.FC<SlidingPanelBarProps> = ({
+  selectedRowData,
+  isOpen,
+  toggleDrawer,
+}) => {
   return (
     <div>
       <Drawer
@@ -15,16 +38,17 @@ const SlidingPanelBar = ({ selectedRowData, isOpen, toggleDrawer }) => {
         direction="right"
         className="w-[500px] bg-transparent"
       >
-        <div className="">
-          <div className="">
-            <div key={selectedRowData.id} className="">
+        <div>
+          {selectedRowData ? ( // Check if selectedRowData is not null
+            <div key={selectedRowData.id}>
               <div className="flex items-center h-32 bg-[#2A5B7E] px-4 gap-x-4">
-                <img
-                  src={selectedRowData.userImg}
-                  alt="User"
-                  className="h-20 w-20 rounded-full"
-                />
-
+                {selectedRowData.userImg && (
+                  <img
+                    src={selectedRowData.userImg}
+                    alt="User"
+                    className="h-20 w-20 rounded-full"
+                  />
+                )}
                 <div className="space-x-2">
                   <p className="font-medium text-white py-2">
                     {selectedRowData.name}
@@ -46,7 +70,7 @@ const SlidingPanelBar = ({ selectedRowData, isOpen, toggleDrawer }) => {
                   </div>
                 </div>
               </div>
-              <div className="bg-slate-50/30 shadow-md m-2 p-2  border border-gray-100">
+              <div className="bg-slate-50/30 shadow-md m-2 p-2 border border-gray-100">
                 <p className="bg-gray-100 p-3 text-base font-medium">
                   Personal Information
                 </p>
@@ -116,7 +140,9 @@ const SlidingPanelBar = ({ selectedRowData, isOpen, toggleDrawer }) => {
                 </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div>No data selected</div> // Render this if no row is selected
+          )}
         </div>
       </Drawer>
     </div>
